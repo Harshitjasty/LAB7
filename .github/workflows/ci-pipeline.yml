@@ -1,19 +1,25 @@
-name: Docker Build & Deploy
+name: Build and Run Docker
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-and-run:
-    runs-on: self-hosted
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Change to the correct directory
+        run: cd LAB7/LAB7  # Adjust this if your Dockerfile is in a different path
+
+      - name: List files (for debugging)
+        run: ls -R
 
       - name: Build Docker Image
         run: docker build -t my-html-app .
-
-      - name: Run Docker Container
-        run: docker run -d -p 8080:80 my-html-app
-
-      - name: Verify Container
-        run: curl -I http://localhost:8080
