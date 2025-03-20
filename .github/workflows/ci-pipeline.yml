@@ -1,11 +1,10 @@
-name: Test Self-Hosted Runner
+name: Test Self-Hosted Runner with Docker & HTML
 
 on: [push, pull_request]
 
 jobs:
   test-runner:
     runs-on: self-hosted
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -15,3 +14,22 @@ jobs:
 
       - name: List Files
         run: ls -alh
+
+      - name: Install Docker (if not installed)
+        run: |
+          if ! command -v docker &> /dev/null; then
+            sudo apt update
+            sudo apt install -y docker.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
+            sudo usermod -aG docker $USER
+          fi
+          docker --version
+
+      - name: Build and Run Docker Container
+        run: |
+          docker build -t my-html-app .
+          docker run -d -p 8080:80 my-html-app
+
+      - name: Check Running Containers
+        run: docker ps -a
